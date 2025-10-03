@@ -9,7 +9,7 @@ class UsuarioView:
         self.controlador = controlador
         self.master.title("Gestión de Usuarios")
 
-        # Variables para los Entry (usar StringVar hace más fiable limpiar y setear)
+        # Variables para los Entry
         self.var_nombre = tk.StringVar()
         self.var_cedula = tk.StringVar()
         self.var_correo = tk.StringVar()
@@ -39,36 +39,47 @@ class UsuarioView:
         self.tree.heading("Correo", text="Correo")
         self.tree.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
 
-        # Scrollbars (opcional, recomendado)
+        # Scrollbars
         vsb = ttk.Scrollbar(master, orient="vertical", command=self.tree.yview)
         vsb.grid(row=4, column=3, sticky="ns")
         self.tree.configure(yscrollcommand=vsb.set)
 
-        # Bind para seleccionar fila (sólo llena campos cuando el usuario hace selección manual)
+        # Bind para seleccionar fila (sólo llena los campos cuando el usuario hace selección manual)
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
         # Inicializar vista
         self.refrescar()
 
-    # -------------------
-    # VALIDACIONES (ejemplo: cédula numérica y correos válidos)
-    # -------------------
+    # VALIDACIONES nombre, cédula y correo
     def validar_datos(self, nombre, cedula, correo):
         if not nombre.strip():
             messagebox.showerror("Error", "El nombre no puede estar vacío")
             return False
+        
         if not cedula.isdigit():
             messagebox.showerror("Error", "La cédula solo puede contener números")
             return False
+        
+        usuarios = self.controlador.listar_usuarios()
+        for u in usuarios:
+            if u["cedula"] == cedula:
+                messagebox.showerror("Error", "La cédula ya existe")
+                return False
+        
         patron_correo = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(patron_correo, correo.strip()):
             messagebox.showerror("Error", "El correo no es válido")
             return False
+        
+        usuarios = self.controlador.listar_usuarios()
+        for u in usuarios:
+            if u["correo"] == correo:
+                messagebox.showerror("Error", "El correo ya existe")
+                return False
+            
         return True
 
-    # -------------------
     # CRUD
-    # -------------------
     def agregar_usuario(self):
         nombre = self.var_nombre.get()
         cedula = self.var_cedula.get()
@@ -79,7 +90,6 @@ class UsuarioView:
 
         datos = {"nombre": nombre, "cedula": cedula, "correo": correo}
         self.controlador.crear_usuario(datos)
-        # refrescar() ya limpia el formulario al final
         self.refrescar()
 
     def actualizar_usuario(self):
@@ -120,14 +130,13 @@ class UsuarioView:
             self.tree.insert("", "end", values=(usuario["nombre"], usuario["cedula"], usuario["correo"]))
 
         # evitar que la selección automática llene campos: quitar selección si existe
-        try:
-            current_sel = self.tree.selection()
-            if current_sel:
-                self.tree.selection_remove(current_sel)
-        except Exception:
-            pass
+        # try:
+        #     current_sel = self.tree.selection()
+        #     if current_sel:
+        #         self.tree.selection_remove(current_sel)
+        # except Exception:
+        #     pass 
 
-        # finalmente limpiar formulario (aquí garantizamos que quede vacío)
         self.limpiar_formulario()
 
     def limpiar_formulario(self):
