@@ -7,6 +7,30 @@
 Faboteca es una aplicación de escritorio desarrollada en **Python** con **Tkinter** que permite la **gestión de usuarios, libros y préstamos** en una biblioteca.  
 La persistencia de datos está implementada con **MongoDB Atlas** para garantizar seguridad, escalabilidad y acceso desde la nube.
 
+## 📂 Estructura del proyecto
+```bash
+Faboteca.py/
+│── main.py                 # Punto de entrada principal
+│── .env                    # Variables de entorno
+│── mongodb.py              # Clase de conexión a MongoDB Atlas
+│
+├── model/                  # Modelos (acceso a datos)
+│   ├── usuario_model.py
+│   ├── libro_model.py
+│   └── prestamo_model.py
+│
+├── controller/             # Controladores (lógica de negocio)
+│   ├── usuario_controller.py
+│   ├── libro_controller.py
+│   └── prestamo_controller.py
+│
+└── view/                   # Vistas gráficas (Tkinter)
+    ├── menu_view.py
+    ├── usuario_view.py
+    ├── libro_view.py
+    └── prestamo_view.py
+```
+
 ---
 
 ## 🚀 Características principales
@@ -35,25 +59,30 @@ La persistencia de datos está implementada con **MongoDB Atlas** para garantiza
 
 ---
 
-## 📂 Estructura del proyecto
+⚙️ Instalación y configuración
+1. Clonar repositorio
 ```bash
-Faboteca.py/
-│── main.py                 # Punto de entrada principal
-│── .env                    # Variables de entorno
-│── mongodb.py              # Clase de conexión a MongoDB Atlas
-│
-├── model/                  # Modelos (acceso a datos)
-│   ├── usuario_model.py
-│   ├── libro_model.py
-│   └── prestamo_model.py
-│
-├── controller/             # Controladores (lógica de negocio)
-│   ├── usuario_controller.py
-│   ├── libro_controller.py
-│   └── prestamo_controller.py
-│
-└── view/                   # Vistas gráficas (Tkinter)
-    ├── menu_view.py
-    ├── usuario_view.py
-    ├── libro_view.py
-    └── prestamo_view.py
+git clone https://github.com/<tu-usuario>/Faboteca.git
+cd Faboteca.py
+```
+
+2. Instalar dependencias
+```bash
+python -m pip install "pymongo[srv]==3.12"
+pip install python-dotenv
+```
+
+3. Configurar variables de entorno
+```bash
+Crear archivo .env en la raíz del proyecto
+```
+4. Ejecución
+```bash
+python main.py
+```
+
+Se abrirá la ventana principal del sistema, desde donde podrás acceder a:
+
+- Gestión de Usuarios
+- Gestión de Libros
+- Gestión de Préstamos
