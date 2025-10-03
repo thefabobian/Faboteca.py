@@ -1,32 +1,20 @@
-import json
-import os
+from mongodb import MongoDB
 
 class UsuarioModel:
-    def __init__(self, archivo="data/usuarios.json"):
-        self.archivo = archivo
-        if not os.path.exists(self.archivo):
-            with open(self.archivo, "w") as f:
-                json.dump([], f)
+    def __init__(self):
+        db = MongoDB()
+        self.collection = db.get_collection("usuarios")
 
-    def leer_usuarios(self):
-        with open(self.archivo, "r") as f:
-            return json.load(f)
-
-    def guardar_usuarios(self, usuarios):
-        with open(self.archivo, "w") as f:
-            json.dump(usuarios, f, indent=4)
+    def listar_usuarios(self):
+        # devolvemos lista de usuarios sin el _id interno de Mongo
+        return list(self.collection.find({}, {"_id": 0}))
 
     def crear_usuario(self, usuario):
-        usuarios = self.leer_usuarios()
-        usuarios.append(usuario)
-        self.guardar_usuarios(usuarios)
+        self.collection.insert_one(usuario)
 
-    def actualizar_usuario(self, index, usuario_actualizado):
-        usuarios = self.leer_usuarios()
-        usuarios[index] = usuario_actualizado
-        self.guardar_usuarios(usuarios)
+    def actualizar_usuario(self, cedula, usuario_actualizado):
+        # buscamos por cédula porque es nuestro identificador único
+        self.collection.update_one({"cedula": cedula}, {"$set": usuario_actualizado})
 
-    def eliminar_usuario(self, index):
-        usuarios = self.leer_usuarios()
-        usuarios.pop(index)
-        self.guardar_usuarios(usuarios)
+    def eliminar_usuario(self, cedula):
+        self.collection.delete_one({"cedula": cedula})
