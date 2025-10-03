@@ -3,8 +3,6 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
 ![Tkinter](https://img.shields.io/badge/Tkinter-GUI-lightgrey)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Status](https://img.shields.io/badge/Status-En%20desarrollo-orange)
 
 Faboteca es una aplicación de escritorio desarrollada en **Python** con **Tkinter** que permite la **gestión de usuarios, libros y préstamos** en una biblioteca.  
 La persistencia de datos está implementada con **MongoDB Atlas** para garantizar seguridad, escalabilidad y acceso desde la nube.
