@@ -3,9 +3,10 @@ from tkinter import ttk, messagebox
 import re
 
 class UsuarioView:
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador, ventana_principal=None):
         self.master = master
         self.controlador = controlador
+        self.ventana_principal = ventana_principal
         self.master.title("Gestión de Usuarios")
 
         # Variables para los Entry
@@ -43,11 +44,21 @@ class UsuarioView:
         vsb.grid(row=4, column=3, sticky="ns")
         self.tree.configure(yscrollcommand=vsb.set)
 
-        # Bind para seleccionar fila (sólo llena los campos cuando el usuario hace selección manual)
+        # Bind para seleccionar fila
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
+        # Botón para volver al menú principal
+        tk.Button(master, text="Volver al Menú Principal", command=self.volver_menu).grid(row=5, column=0, columnspan=3, pady=10)
+        
         # Inicializar vista
         self.refrescar()
+
+    def volver_menu(self):
+        if self.ventana_principal:
+            self.master.destroy()
+            self.ventana_principal.deiconify()
+        else:
+            self.master.quit()
 
     # VALIDACIONES nombre, cédula y correo
     def validar_datos(self, nombre, cedula, correo):
@@ -61,7 +72,7 @@ class UsuarioView:
         
         usuarios = self.controlador.listar_usuarios()
         for u in usuarios:
-            if u["cedula"] == cedula:
+            if u["cedula"] == cedula and u["correo"] != correo:
                 messagebox.showerror("Error", "La cédula ya existe")
                 return False
         
@@ -70,9 +81,8 @@ class UsuarioView:
             messagebox.showerror("Error", "El correo no es válido")
             return False
         
-        usuarios = self.controlador.listar_usuarios()
         for u in usuarios:
-            if u["correo"] == correo:
+            if u["correo"] == correo and u["cedula"] != cedula:
                 messagebox.showerror("Error", "El correo ya existe")
                 return False
             
@@ -96,7 +106,8 @@ class UsuarioView:
         if not seleccionado:
             messagebox.showwarning("Atención", "Seleccione un usuario para actualizar")
             return
-        index = self.tree.index(seleccionado[0])
+
+        cedula_original = self.tree.item(seleccionado[0])["values"][1]
 
         nombre = self.var_nombre.get()
         cedula = self.var_cedula.get()
@@ -106,7 +117,7 @@ class UsuarioView:
             return
 
         datos = {"nombre": nombre, "cedula": cedula, "correo": correo}
-        self.controlador.actualizar_usuario(index, datos)
+        self.controlador.actualizar_usuario(cedula_original, datos)
         self.refrescar()
 
     def eliminar_usuario(self):
@@ -114,10 +125,11 @@ class UsuarioView:
         if not seleccionado:
             messagebox.showwarning("Atención", "Seleccione un usuario para eliminar")
             return
-        index = self.tree.index(seleccionado[0])
-        # confirmación
+        
+        cedula = self.tree.item(seleccionado[0])["values"][1]
+
         if messagebox.askyesno("Confirmar", "¿Seguro que desea eliminar este usuario?"):
-            self.controlador.eliminar_usuario(index)
+            self.controlador.eliminar_usuario(cedula)
             self.refrescar()
 
     def refrescar(self):
@@ -128,7 +140,7 @@ class UsuarioView:
         for usuario in usuarios:
             self.tree.insert("", "end", values=(usuario["nombre"], usuario["cedula"], usuario["correo"]))
 
-        # evitar que la selección automática llene campos
+        # quitar selección
         try:
             current_sel = self.tree.selection()
             if current_sel:
@@ -148,11 +160,8 @@ class UsuarioView:
         sel = self.tree.selection()
         if not sel:
             return
-        idx = self.tree.index(sel[0])
-        usuarios = self.controlador.listar_usuarios()
-        if idx < len(usuarios):
-            u = usuarios[idx]
-            # llenar campos con el seleccionado
-            self.var_nombre.set(u.get("nombre", ""))
-            self.var_cedula.set(u.get("cedula", ""))
-            self.var_correo.set(u.get("correo", ""))
+        values = self.tree.item(sel[0])["values"]
+        if values:
+            self.var_nombre.set(values[0])
+            self.var_cedula.set(values[1])
+            self.var_correo.set(values[2])
