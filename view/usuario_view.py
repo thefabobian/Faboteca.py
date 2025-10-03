@@ -129,26 +129,22 @@ class UsuarioView:
         for usuario in usuarios:
             self.tree.insert("", "end", values=(usuario["nombre"], usuario["cedula"], usuario["correo"]))
 
-        # evitar que la selección automática llene campos: quitar selección si existe
-        # try:
-        #     current_sel = self.tree.selection()
-        #     if current_sel:
-        #         self.tree.selection_remove(current_sel)
-        # except Exception:
-        #     pass 
+        # evitar que la selección automática llene campos
+        try:
+            current_sel = self.tree.selection()
+            if current_sel:
+                self.tree.selection_remove(current_sel)
+        except Exception:
+            pass 
 
         self.limpiar_formulario()
 
     def limpiar_formulario(self):
-        # si usas StringVar -> set('')
         self.var_nombre.set("")
         self.var_cedula.set("")
         self.var_correo.set("")
-        # Si no usas StringVar, usar: self.entry_nombre.delete(0, tk.END) etc.
 
-    # -------------------
-    # Manejo selección (cuando el usuario hace click)
-    # -------------------
+    # Manejo selección (cuando el usuario hace click)  
     def on_tree_select(self, event):
         sel = self.tree.selection()
         if not sel:
