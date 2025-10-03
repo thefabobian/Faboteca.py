@@ -2,9 +2,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 class LibroView:
-    def __init__(self, master, controlador):
+    def __init__(self, master, controlador, ventana_principal=None):
         self.master = master
         self.controlador = controlador
+        self.ventana_principal = ventana_principal
         self.master.title("Gestión de Libros")
 
         # Variables para los Entry
@@ -46,6 +47,9 @@ class LibroView:
         # Bind para seleccionar fila
         self.tree.bind("<<TreeviewSelect>>", self.on_tree_select)
 
+        # Botón para volver al menú principal
+        tk.Button(master, text="Volver al Menú Principal", command=self.volver_menu).grid(row=6, column=0, columnspan=3, pady=10)  
+        
         # Inicializar vista
         self.refrescar()
 
@@ -54,27 +58,12 @@ class LibroView:
         vsb.grid(row=5, column=3, sticky="ns")
         self.tree.configure(yscrollcommand=vsb.set)
 
-    # VALIDACIONES título, autor, género y evitar duplicados
-    def validar_datos(self, titulo, autor, genero, estado, index=None):
-        if not titulo.strip():
-            messagebox.showerror("Error", "El título no puede estar vacío")
-            return False
-        if not autor.strip():
-            messagebox.showerror("Error", "El autor no puede estar vacío")
-            return False
-        if not genero.strip():
-            messagebox.showerror("Error", "El género no puede estar vacío")
-            return False
-
-        # Evitar duplicados (título + autor)
-        libros = self.controlador.listar_libros()
-        for i, l in enumerate(libros):
-            if l["titulo"] == titulo and l["autor"] == autor:
-                if index is None or index != i:
-                    messagebox.showerror("Error", f"El libro '{titulo}' de {autor} ya está registrado")
-                    return False
-
-        return True
+    def volver_menu(self):
+        if self.ventana_principal:
+            self.master.destroy()
+            self.ventana_principal.deiconify()
+        else:
+            self.master.quit()
 
     # CRUD
     def agregar_libro(self):
@@ -83,12 +72,16 @@ class LibroView:
         genero = self.var_genero.get()
         estado = self.var_estado.get()
 
-        if not self.validar_datos(titulo, autor, genero, estado):
+        if not titulo.strip() or not autor.strip() or not genero.strip():
+            messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
 
         datos = {"titulo": titulo, "autor": autor, "genero": genero, "estado": estado}
-        self.controlador.crear_libro(datos)
-        self.refrescar()
+        try:
+            self.controlador.crear_libro(datos)
+            self.refrescar()
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
 
     def actualizar_libro(self):
         sel = self.tree.selection()
@@ -96,18 +89,17 @@ class LibroView:
             messagebox.showwarning("Advertencia", "Seleccione un libro para actualizar")
             return
 
-        index = self.tree.index(sel[0])
+        values = self.tree.item(sel[0])["values"]
+        titulo_original, autor_original = values[0], values[1]
 
-        titulo = self.var_titulo.get()
-        autor = self.var_autor.get()
-        genero = self.var_genero.get()
-        estado = self.var_estado.get()
+        datos = {
+            "titulo": self.var_titulo.get(),
+            "autor": self.var_autor.get(),
+            "genero": self.var_genero.get(),
+            "estado": self.var_estado.get()
+        }
 
-        if not self.validar_datos(titulo, autor, genero, estado, index = index):
-            return
-
-        datos = {"titulo": titulo, "autor": autor, "genero": genero, "estado": estado}
-        self.controlador.actualizar_libro(index, datos)
+        self.controlador.actualizar_libro(titulo_original, autor_original, datos)
         self.refrescar()
 
     def eliminar_libro(self):
@@ -116,30 +108,23 @@ class LibroView:
             messagebox.showwarning("Advertencia", "Seleccione un libro para eliminar")
             return
 
-        index = self.tree.index(sel[0])
-        confirm = messagebox.askyesno("Confirmar", "¿Está seguro de eliminar el libro seleccionado?")
+        values = self.tree.item(sel[0])["values"]
+        titulo, autor = values[0], values[1]
+
+        confirm = messagebox.askyesno("Confirmar", f"¿Está seguro de eliminar '{titulo}' de {autor}?")
         if confirm:
-            self.controlador.eliminar_libro(index)
+            self.controlador.eliminar_libro(titulo, autor)
             self.refrescar()
     
     def refrescar(self):
         # Limpiar tabla
         for row in self.tree.get_children():
             self.tree.delete(row)
-        # Cargar datos
+
         libros = self.controlador.listar_libros()
         for libro in libros:
             self.tree.insert("", "end", values=(libro["titulo"], libro["autor"], libro["genero"], libro["estado"]))
 
-        # evitar que la selección automática llene campos: quitar selección si existe
-        try:
-            current_sel = self.tree.selection()
-            if current_sel:
-                self.tree.selection_remove(current_sel)
-        except Exception:
-            pass 
-
-        # finalmente limpiar formulario (aquí garantizamos que quede vacío)
         self.limpiar_formulario()
     
     def limpiar_formulario(self):
@@ -148,17 +133,13 @@ class LibroView:
         self.var_genero.set("")
         self.var_estado.set("Disponible")
 
-    # Manejo selección (cuando el usuario hace click)  
     def on_tree_select(self, event):
         sel = self.tree.selection()
         if not sel:
             return
-        index = self.tree.index(sel[0])
-        libros = self.controlador.listar_libros()
-        if index < len(libros):
-            l = libros[index]
-            # llenar campos con el seleccionado
-            self.var_titulo.set(l.get("titulo", ""))
-            self.var_autor.set(l.get("autor", ""))
-            self.var_genero.set(l.get("genero", ""))
-            self.var_estado.set(l.get("estado", ""))
+        values = self.tree.item(sel[0])["values"]
+        if values:
+            self.var_titulo.set(values[0])
+            self.var_autor.set(values[1])
+            self.var_genero.set(values[2])
+            self.var_estado.set(values[3])
