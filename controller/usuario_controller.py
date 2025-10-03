@@ -5,13 +5,13 @@ class UsuarioController:
         self.model = UsuarioModel()
 
     def listar_usuarios(self):
-        return self.model.leer_usuarios()
+        return self.model.listar_usuarios()
 
     def crear_usuario(self, usuario):
         self.model.crear_usuario(usuario)
 
-    def actualizar_usuario(self, index, usuario_actualizado):
-        self.model.actualizar_usuario(index, usuario_actualizado)
+    def actualizar_usuario(self, cedula, usuario_actualizado):
+        self.model.actualizar_usuario(cedula, usuario_actualizado)
 
-    def eliminar_usuario(self, index):
-        self.model.eliminar_usuario(index)
+    def eliminar_usuario(self, cedula):
+        self.model.eliminar_usuario(cedula)
