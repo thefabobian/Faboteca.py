@@ -1,6 +1,7 @@
 # vistas/usuario_view.py
 import tkinter as tk
 from tkinter import ttk, messagebox
+import re
 
 class UsuarioView:
     def __init__(self, master, controlador):
@@ -59,10 +60,9 @@ class UsuarioView:
         if not cedula.isdigit():
             messagebox.showerror("Error", "La cédula solo puede contener números")
             return False
-        dominios_validos = ("@gmail.com", "@hotmail.com", "@outlook.com", "@yahoo.com")
-        correo_lower = correo.strip().lower()
-        if "@" not in correo_lower or not any(correo_lower.endswith(dom) for dom in dominios_validos):
-            messagebox.showerror("Error", "El correo debe ser válido (ej: usuario@gmail.com)")
+        patron_correo = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(patron_correo, correo.strip()):
+            messagebox.showerror("Error", "El correo no es válido")
             return False
         return True
 
