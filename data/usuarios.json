@@ -18,5 +18,20 @@
         "nombre": "Patricia",
         "cedula": "50893205",
         "correo": "patricia@local.com"
+    },
+    {
+        "nombre": "Fabian",
+        "cedula": "1029720113",
+        "correo": "fabian@gmail.com"
+    },
+    {
+        "nombre": "Fabian",
+        "cedula": "1029720112",
+        "correo": "fabian@gmail.com"
+    },
+    {
+        "nombre": "Fabian",
+        "cedula": "1029720115",
+        "correo": "fabiane@gmail.com"
     }
 ]
