@@ -1,32 +1,24 @@
-import json
-import os
+from mongodb import MongoDB
 
 class LibroModel:
-    def __init__(self, archivo="data/libros.json"):
-        self.archivo = archivo
-        if not os.path.exists(self.archivo):
-            with open(self.archivo, "w") as f:
-                json.dump([], f)
+    def __init__(self):
+        db = MongoDB()
+        self.collection = db.db["libros"]
 
-    def leer_libros(self):
-        with open(self.archivo, "r") as f:
-            return json.load(f)
-
-    def guardar_libros(self, libros):
-        with open(self.archivo, "w") as f:
-            json.dump(libros, f, indent=4)
+    def listar_libros(self):
+        return list(self.collection.find({}, {"_id": 0}))  # sin _id para simplificar
 
     def crear_libro(self, libro):
-        libros = self.leer_libros()
-        libros.append(libro)
-        self.guardar_libros(libros)
+        # Verificar duplicado por título + autor
+        if self.collection.find_one({"titulo": libro["titulo"], "autor": libro["autor"]}):
+            raise ValueError(f"El libro '{libro['titulo']}' de {libro['autor']} ya existe")
+        self.collection.insert_one(libro)
 
-    def actualizar_libro(self, index, libro_actualizado):
-        libros = self.leer_libros()
-        libros[index] = libro_actualizado
-        self.guardar_libros(libros)
+    def actualizar_libro(self, titulo_original, autor_original, libro_actualizado):
+        self.collection.update_one(
+            {"titulo": titulo_original, "autor": autor_original},
+            {"$set": libro_actualizado}
+        )
 
-    def eliminar_libro(self, index):
-        libros = self.leer_libros()
-        libros.pop(index)
-        self.guardar_libros(libros)
+    def eliminar_libro(self, titulo, autor):
+        self.collection.delete_one({"titulo": titulo, "autor": autor})
