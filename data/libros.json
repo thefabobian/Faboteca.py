@@ -1,0 +1,14 @@
+[
+    {
+        "titulo": "Sim\u00f3n el Bobito",
+        "autor": "Rafael Pombo",
+        "genero": "Fabula",
+        "estado": "Prestado"
+    },
+    {
+        "titulo": "Don Quijote",
+        "autor": "Miguel Saavedra",
+        "genero": "Fantasia",
+        "estado": "Disponible"
+    }
+]
