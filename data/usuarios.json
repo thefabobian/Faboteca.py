@@ -13,5 +13,10 @@
         "nombre": "Fabian",
         "cedula": "1029720113",
         "correo": "fabian@gmail.com"
+    },
+    {
+        "nombre": "Patricia",
+        "cedula": "50893205",
+        "correo": "patricia@local.com"
     }
 ]
