@@ -1,11 +1,9 @@
 import tkinter as tk
-from view.libro_view import LibroView
-from controller.libro_controller import LibroController
+from view.menu_view import MenuView
 
 def main():
     root = tk.Tk()
-    controlador = LibroController()
-    LibroView(root, controlador)
+    MenuView(root)
     root.mainloop()
 
 if __name__ == "__main__":
