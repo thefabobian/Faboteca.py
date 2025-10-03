@@ -1,7 +1,17 @@
 [
     {
-        "nombre": "f",
-        "cedula": "f",
-        "correo": "f"
+        "nombre": "Lucy",
+        "cedula": "123456789",
+        "correo": "dqffasd@gmail.com"
+    },
+    {
+        "nombre": "Jose",
+        "cedula": "9867565",
+        "correo": "jose@hotmail.com"
+    },
+    {
+        "nombre": "Fabian",
+        "cedula": "1029720113",
+        "correo": "fabian@gmail.com"
     }
 ]
