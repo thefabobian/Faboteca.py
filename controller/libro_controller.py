@@ -5,13 +5,13 @@ class LibroController:
         self.model = LibroModel()
 
     def listar_libros(self):
-        return self.model.leer_libros()
+        return self.model.listar_libros()
 
     def crear_libro(self, libro):
         self.model.crear_libro(libro)
 
-    def actualizar_libro(self, index, libro_actualizado):
-        self.model.actualizar_libro(index, libro_actualizado)
+    def actualizar_libro(self, titulo_original, autor_original, libro_actualizado):
+        self.model.actualizar_libro(titulo_original, autor_original, libro_actualizado)
 
-    def eliminar_libro(self, index):
-        self.model.eliminar_libro(index)
+    def eliminar_libro(self, titulo, autor):
+        self.model.eliminar_libro(titulo, autor)
